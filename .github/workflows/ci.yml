@@ -1,0 +1,57 @@
+name: CI — Build, Test & Publish Allure to Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Build & run tests
+        run: mvn --batch-mode clean test
+
+      - name: Generate Allure report
+        run: mvn --batch-mode verify
+
+  publish-pages:
+    name: Publish Allure Report to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Upload Allure HTML as artifact for Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: target/site/allure-maven-plugin
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: publish-pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy artifact to Pages
+        uses: actions/deploy-pages@v1

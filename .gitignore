@@ -1,0 +1,20 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Allure results
+.allure/
+
+# Maven build output
+/target/
+
+# Logs
+*.log
+
+# Arquivos de SO
+.DS_Store
+Thumbs.db
+
+# Wrapper do Maven (se você quiser versionar só o .mvn)
+/mvnw
+/mvnw.cmd
