@@ -5,6 +5,7 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.example</groupId>
     <artifactId>selenium-web-automation-example</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -12,22 +13,20 @@
 
     <properties>
         <!-- Java & encoding -->
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>11</maven.compiler.release>
 
         <!-- Versions -->
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
         <selenium.version>4.33.0</selenium.version>
         <webdrivermanager.version>6.1.0</webdrivermanager.version>
 
-        <!-- Allure BOM (2.27.0 exists in Central) -->
-        <allure.version>2.27.0</allure.version>       <!-- :contentReference[oaicite:0]{index=0} -->
-        <!-- Choose a plugin version compatible with Maven 3.8.x -->
-        <allure.plugin.version>2.11.2</allure.plugin.version>  <!-- :contentReference[oaicite:1]{index=1} -->
+        <!-- Allure BOM & plugin -->
+        <allure.version>2.27.0</allure.version>
+        <allure.plugin.version>2.11.2</allure.plugin.version>
 
-        <!-- Override vulnerable transitive dependencies -->
+        <!-- Overrides for vulnerable dependencies -->
         <jackson.version>2.15.2</jackson.version>
         <tika.version>2.9.0</tika.version>
     </properties>
@@ -93,7 +92,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Allure -->
+        <!-- Allure JUnit 5 Integration -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
@@ -102,22 +101,31 @@
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-attachments</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Simple SLF4J logger for tests -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Compile with UTF-8 -->
+            <!-- Java Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
 
-            <!-- Run tests -->
+            <!-- Surefire (JUnit Platform auto-detects JUnit 5) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -125,14 +133,19 @@
                 <configuration>
                     <useModulePath>false</useModulePath>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <!-- falha o build em caso de testes quebrados -->
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                    </includes>
                     <systemPropertyVariables>
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
 
-            <!-- Generate Allure report -->
+            <!-- Allure Report Generation -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
@@ -143,7 +156,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>allure-report</id>
+                        <id>generate-allure-report</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>report</goal>
@@ -153,5 +166,21 @@
             </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <!-- Excluir apenas dependency-info do site -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.6.2</version>
+                <configuration>
+                    <pluginManagementExcludes>
+                        <pluginManagementExclude>dependency-info</pluginManagementExclude>
+                    </pluginManagementExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

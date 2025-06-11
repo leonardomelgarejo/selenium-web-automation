@@ -1,11 +1,13 @@
 package tests;
 
 import base.BaseTest;
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.Test;
 import pages.LoginPage;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Feature("Login")
 public class LoginTest extends BaseTest {
 
     @Test
@@ -18,6 +20,6 @@ public class LoginTest extends BaseTest {
                 .clickLogin()
                 .isHomePageLogo();
 
-        assertTrue(loggedIn, "Deveria exibir mensagem de boas-vindas após login com sucesso");
+        assertTrue(loggedIn, "Deveria exibir a homepage");
     }
 }

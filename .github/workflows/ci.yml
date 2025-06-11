@@ -1,10 +1,11 @@
-name: CI — Build, Test & Publish Allure to Pages
+name: CI
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,39 +20,28 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Cache Maven repository
+      - name: Cache Maven packages
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
-      - name: Build & run tests
-        run: mvn --batch-mode clean test
+      - name: Build, run tests & generate site (incluindo Allure)
+        run: mvn --batch-mode clean verify site
 
-      - name: Generate Allure report
-        run: mvn --batch-mode verify
+      - name: Upload site directory for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/site/allure-maven-plugin
 
-  publish-pages:
-    name: Publish Allure Report to GitHub Pages
+  publish-to-pages:
     needs: build
     runs-on: ubuntu-latest
-
     permissions:
       pages: write
       id-token: write
 
     steps:
-      - name: Upload Allure HTML as artifact for Pages
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: target/site/allure-maven-plugin
-
-  deploy-pages:
-    name: Deploy to GitHub Pages
-    needs: publish-pages
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy artifact to Pages
-        uses: actions/deploy-pages@v1
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
