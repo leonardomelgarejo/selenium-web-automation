@@ -36,4 +36,17 @@ public class LoginTest extends BaseTest {
 
         assertEquals(loginErrorMessage, "Username and password do not match any user in this service");
     }
+
+    @Test
+    public void shouldNotLoginWithInvalidPassword() {
+        driver.get("https://www.saucedemo.com");
+
+        String loginErrorMessage = new LoginPage(driver)
+                .enterUsername("standard_user")
+                .enterPassword("invalid_password")
+                .clickLoginShouldFailWhenUserIsInvalid()
+                .getLoginErrorMessage();
+
+        assertEquals(loginErrorMessage, "Username and password do not match any user in this service");
+    }
 }
