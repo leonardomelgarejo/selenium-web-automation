@@ -15,4 +15,5 @@ public class HomePage {
     public boolean isHomePageLogo() {
         return driver.findElement(homePageLogo).isDisplayed();
     }
+
 }
