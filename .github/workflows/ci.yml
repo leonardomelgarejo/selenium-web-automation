@@ -7,28 +7,28 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  BASE_URL: ${{ secrets.BASE_URL }}
+  USERNAME: ${{ secrets.USERNAME }}
+  PASSWORD: ${{ secrets.PASSWORD }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 11
+      - name: Set up JDK 11 + cache Maven
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
+          cache: maven
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-
-      - name: Build, run tests & generate site (incluindo Allure)
-        run: mvn --batch-mode clean verify site
+      - name: Build, run tests & generate Allure Report
+        run: mvn -B -T1C clean verify site
 
       - name: Upload site directory for Pages
         uses: actions/upload-pages-artifact@v3

@@ -1,6 +1,7 @@
 package tests;
 
 import base.BaseTest;
+import config.Config;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.Test;
 import pages.LoginPage;
@@ -13,11 +14,11 @@ public class LoginTest extends BaseTest {
 
     @Test
     public void shouldLoginSuccessfully() {
-        driver.get("https://www.saucedemo.com");
+        driver.get(Config.BASE_URL);
 
         boolean loggedIn = new LoginPage(driver)
-                .enterUsername("standard_user")
-                .enterPassword("secret_sauce")
+                .enterUsername(Config.USERNAME)
+                .enterPassword(Config.PASSWORD)
                 .clickLogin()
                 .isHomePageLogo();
 
@@ -26,11 +27,11 @@ public class LoginTest extends BaseTest {
 
     @Test
     public void shouldNotLoginWithInvalidUser() {
-        driver.get("https://www.saucedemo.com");
+        driver.get(Config.BASE_URL);
 
         String loginErrorMessage = new LoginPage(driver)
                 .enterUsername("invalid_user")
-                .enterPassword("secret_sauce")
+                .enterPassword(Config.PASSWORD)
                 .clickLoginShouldFailWhenUserIsInvalid()
                 .getLoginErrorMessage();
 
@@ -39,10 +40,10 @@ public class LoginTest extends BaseTest {
 
     @Test
     public void shouldNotLoginWithInvalidPassword() {
-        driver.get("https://www.saucedemo.com");
+        driver.get(Config.BASE_URL);
 
         String loginErrorMessage = new LoginPage(driver)
-                .enterUsername("standard_user")
+                .enterUsername(Config.USERNAME)
                 .enterPassword("invalid_password")
                 .clickLoginShouldFailWhenUserIsInvalid()
                 .getLoginErrorMessage();
